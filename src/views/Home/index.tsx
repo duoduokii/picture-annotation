@@ -1,8 +1,8 @@
-import { defineComponent, onMounted, ref } from "vue";
-import Konva from "konva";
-import type { Shape } from "konva/types/Shape";
+import { defineComponent, onMounted, ref, watch } from "vue";
+import type { Stage } from "konva/types/Stage";
+import type { Layer } from "konva/types/Layer";
 
-import { createKonvaStage, drawKonvaRect } from "@/utils/konva";
+import { createKonvaStage, createKonvaLayer, drawKonvaRect } from "@/utils/konva";
 import SideBar from "./components/side-bar";
 import classNames from "classnames/bind";
 import Style from "./index.module.scss";
@@ -16,16 +16,17 @@ export default defineComponent({
     const annotationType = ref<string>("");
 
     const refKonvaBox = ref<HTMLDivElement | null>(null);
-    const stageInstance = ref<Shape | null>(null);
+    const stageInstance = ref<Stage | null>(null);
+    const layerInstance = ref<Layer | null>(null);
 
     /**
      * 初始化 konva 实例
      */
     const initKonvaInstance = (el: HTMLDivElement, width: number, height: number) => {
       stageInstance.value = createKonvaStage(el, width, height);
-      const layer = new Konva.Layer();
-      drawKonvaRect(layer);
-      stage.add(layer);
+      layerInstance.value = createKonvaLayer(stageInstance.value as Stage);
+      drawKonvaRect(layerInstance.value as Layer);
+      stageInstance.value.add(layerInstance.value as Layer);
 
       // stage.on("click tap", function (e) {
       //   if (e.target === stage) {
@@ -52,6 +53,9 @@ export default defineComponent({
       //   layer.draw();
       // });
     };
+    watch(annotationType, () => {
+      console.log(123);
+    });
 
     onMounted(() => {
       if (refKonvaBox.value == null) return;

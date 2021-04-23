@@ -10,25 +10,25 @@ import { Rect, RectConfig } from "konva/types/shapes/Rect";
  * @param {number} height
  * @return { Stage } stage
  */
-export const createKonvaStage = (el: HTMLDivElement, width: number, height: number): Stage => {
+export function createKonvaStage(el: HTMLDivElement, width: number, height: number): Stage {
   const stage = new Konva.Stage({
     container: el,
     width,
     height,
   });
   return stage;
-};
+}
 
 /**
  * create Konva Layer
  * @param {Stage} stage
  * @return { Lyaer } layer
  */
-export const createKonvaLayer = (stage: Stage): Layer => {
+export function createKonvaLayer(stage: Stage): Layer {
   const layer = new Konva.Layer();
   stage.add(layer);
   return layer;
-};
+}
 
 /**
  * draw konva rectangle
