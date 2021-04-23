@@ -1,0 +1,25 @@
+.side-bar {
+  padding-top: 40px;
+  width: 60px;
+  height: 100%;
+  background-color: #474747;
+  box-sizing: border-box;
+}
+ul {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  box-sizing: border-box;
+  li {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto;
+  }
+  .actived {
+    background-color: #353535;
+  }
+}
+.center-y {
+  margin-top: 50%;
+  transform: translateY(-50%);
+}
