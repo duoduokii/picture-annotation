@@ -1,13 +1,18 @@
 import { defineComponent, onMounted, ref, watch } from "vue";
+import Konva from "konva";
+import type { Vector2d } from "konva/types/types";
 import type { Stage } from "konva/types/Stage";
 import type { Layer } from "konva/types/Layer";
+import type { Rect, RectConfig } from "konva/types/shapes/Rect";
 
-import { createKonvaStage, createKonvaLayer, drawKonvaRect } from "@/utils/konva";
+import { createKonvaStage, createKonvaLayer, drawKonvaImg, drawKonvaRect } from "@/utils/konva";
 import { useElResize } from "@/hooks/event/useElResize";
 
 import SideBar from "./components/side-bar";
 import classNames from "classnames/bind";
 import Style from "./index.module.scss";
+
+import Logo from "@/assets/konva-test.jpg";
 
 export default defineComponent({
   name: "Home",
@@ -18,8 +23,6 @@ export default defineComponent({
     const annotationType = ref<string>("");
 
     const refKonvaBox = ref<HTMLDivElement | null>(null);
-    const stageInstance = ref<Stage | null>(null);
-    const layerInstance = ref<Layer | null>(null);
 
     watch(annotationType, () => {
       console.log(123);
@@ -34,28 +37,105 @@ export default defineComponent({
       initKonvaInstance(konvaEle, width, height);
 
       const [start, stop] = useElResize(refKonvaBox.value, function () {
-        if (stageInstance.value != null && refKonvaBox.value != null) {
+        if (stageInstance != null && refKonvaBox.value != null) {
           const { width, height } = refKonvaBox.value?.getBoundingClientRect();
-          updateStage(stageInstance.value as Stage, width, height);
+          updateStage(stageInstance, width, height);
         }
       });
       start();
     });
 
+    let stageInstance: Konva.Stage | null = null;
+    let layerInstance: Konva.Layer | null = null;
+    let selectedRect: Konva.Rect | null = null;
+
     /**
-     * 初始化 konva 实例
+     * init Konva's instance
      */
     const initKonvaInstance = (el: HTMLDivElement, width: number, height: number) => {
-      stageInstance.value = createKonvaStage(el, width, height);
-      layerInstance.value = createKonvaLayer(stageInstance.value as Stage);
-      drawKonvaRect(layerInstance.value as Layer);
-      stageInstance.value.add(layerInstance.value as Layer);
+      stageInstance = createKonvaStage(el, width, height);
+      layerInstance = createKonvaLayer(stageInstance);
+      drawKonvaRect(layerInstance);
+      stageInstance.add(layerInstance);
+      drawSelectedRect(stageInstance, layerInstance);
+      if (layerInstance !== null) {
+        drawKonvaImage(layerInstance, "../../assets/logo.png");
+      }
     };
 
+    /**
+     * update Stage's width and height
+     */
     const updateStage = (stage: Stage, width: number, height: number) => {
       stage.width(width);
       stage.height(height);
       stage.draw();
+    };
+
+    const drawKonvaImage = (layer: Konva.Layer, url: string) => {
+      drawKonvaImg(refKonvaBox.value as HTMLDivElement, layer, Logo);
+    };
+
+    /**
+     * draw selection rectangle
+     */
+    const drawSelectedRect = (stage: Stage, layer: Layer, rect?: Rect) => {
+      let selectionRectangle = drawKonvaRect(layer, {
+        fill: "rgba(0,0,255,0.5)",
+      });
+
+      let x1: number, y1: number, x2, y2;
+      stage.on("mousedown", (e) => {
+        let { x, y } = stage.getPointerPosition() as Vector2d;
+        x1 = x;
+        y1 = y;
+        x2 = x;
+        y2 = y;
+
+        selectionRectangle.visible(true);
+        selectionRectangle.width(0);
+        selectionRectangle.height(0);
+        layer.draw();
+      });
+
+      stage.on("mousemove", () => {
+        if (!selectionRectangle.visible()) {
+          return;
+        }
+        if (isNaN(x1) || isNaN(y1)) {
+          return;
+        }
+
+        let { x, y } = stage.getPointerPosition() as Vector2d;
+        x2 = x;
+        y2 = y;
+
+        selectionRectangle.setAttrs({
+          x: Math.min(x1, x2),
+          y: Math.min(y1, y2),
+          width: Math.abs(x2 - x1),
+          height: Math.abs(y2 - y1),
+        });
+        layer.batchDraw();
+      });
+
+      // stage.on("mouseup touchend", () => {
+      //   // no nothing if we didn't start selection
+      //   if (!selectionRectangle.visible()) {
+      //     return;
+      //   }
+      //   // update visibility in timeout, so we can check it in click event
+      //   setTimeout(() => {
+      //     selectionRectangle.visible(false);
+      //     layer.batchDraw();
+      //   });
+
+      //   var shapes = stage.find(".rect").toArray();
+      //   var box = selectionRectangle.getClientRect();
+      //   var selected = shapes.filter((shape) => Konva.Util.haveIntersection(box, shape.getClientRect()));
+      //   tr.nodes(selected);
+      //   layer.batchDraw();
+      // });
     };
 
     return () => (

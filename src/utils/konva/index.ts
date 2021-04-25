@@ -22,12 +22,44 @@ export function createKonvaStage(el: HTMLDivElement, width: number, height: numb
 /**
  * create Konva Layer
  * @param {Stage} stage
- * @return { Lyaer } layer
+ * @return { Layer } layer
  */
 export function createKonvaLayer(stage: Stage): Layer {
   const layer = new Konva.Layer();
   stage.add(layer);
   return layer;
+}
+
+/**
+ * draw konva img
+ * @param {*}
+ * @return {*}
+ */
+export function drawKonvaImg(
+  boxEl: Element,
+  layer: Konva.Layer,
+  url: string,
+  config?: { x: number; y: number; width?: number; height?: number }
+) {
+  console.log(boxEl.clientWidth);
+  const clientW = boxEl.clientWidth;
+  const clientH = boxEl.clientHeight;
+  const img = new Image();
+  img.src = url;
+  const imgW = img.width;
+  const imgH = img.height;
+  img.onload = () => {
+    const konvaImg = new Konva.Image({
+      image: img,
+      x: config?.x || 0,
+      y: config?.y || 0,
+      width: config?.width || img.width,
+      height: config?.height || img.height,
+    });
+    layer.add(konvaImg);
+    layer.batchDraw();
+    return konvaImg;
+  };
 }
 
 /**
