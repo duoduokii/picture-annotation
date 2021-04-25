@@ -8,6 +8,7 @@
   background-color: #333;
 }
 .container {
-  flex: auto;
+  flex: 1;
   height: 100%;
+  overflow: hidden;
 }

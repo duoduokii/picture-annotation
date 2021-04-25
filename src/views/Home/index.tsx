@@ -3,6 +3,8 @@ import type { Stage } from "konva/types/Stage";
 import type { Layer } from "konva/types/Layer";
 
 import { createKonvaStage, createKonvaLayer, drawKonvaRect } from "@/utils/konva";
+import { useElResize } from "@/hooks/event/useElResize";
+
 import SideBar from "./components/side-bar";
 import classNames from "classnames/bind";
 import Style from "./index.module.scss";
@@ -19,40 +21,6 @@ export default defineComponent({
     const stageInstance = ref<Stage | null>(null);
     const layerInstance = ref<Layer | null>(null);
 
-    /**
-     * 初始化 konva 实例
-     */
-    const initKonvaInstance = (el: HTMLDivElement, width: number, height: number) => {
-      stageInstance.value = createKonvaStage(el, width, height);
-      layerInstance.value = createKonvaLayer(stageInstance.value as Stage);
-      drawKonvaRect(layerInstance.value as Layer);
-      stageInstance.value.add(layerInstance.value as Layer);
-
-      // stage.on("click tap", function (e) {
-      //   if (e.target === stage) {
-      //     stage.find("Transformer").destroy();
-      //     layer.draw();
-      //     return;
-      //   }
-      //   if (!e.target.hasName("rect")) {
-      //     return;
-      //   }
-      //   stage.find("Transformer").destroy();
-
-      //   var tr = new Konva.Transformer({
-      //     // anchorStroke: "red",
-      //     anchorFill: "#75afcc",
-      //     anchorSize: 10,
-      //     borderStroke: "grey",
-      //     borderDash: [3, 3],
-      //     ignoreStroke: true,
-      //     padding: 5,
-      //   });
-      //   layer.add(tr);
-      //   tr.attachTo(e.target);
-      //   layer.draw();
-      // });
-    };
     watch(annotationType, () => {
       console.log(123);
     });
@@ -62,8 +30,33 @@ export default defineComponent({
       const konvaEle: HTMLDivElement = refKonvaBox.value;
       const width = konvaEle.clientWidth;
       const height = konvaEle.clientHeight;
+
       initKonvaInstance(konvaEle, width, height);
+
+      const [start, stop] = useElResize(refKonvaBox.value, function () {
+        if (stageInstance.value != null && refKonvaBox.value != null) {
+          const { width, height } = refKonvaBox.value?.getBoundingClientRect();
+          updateStage(stageInstance.value as Stage, width, height);
+        }
+      });
+      start();
     });
+
+    /**
+     * 初始化 konva 实例
+     */
+    const initKonvaInstance = (el: HTMLDivElement, width: number, height: number) => {
+      stageInstance.value = createKonvaStage(el, width, height);
+      layerInstance.value = createKonvaLayer(stageInstance.value as Stage);
+      drawKonvaRect(layerInstance.value as Layer);
+      stageInstance.value.add(layerInstance.value as Layer);
+    };
+
+    const updateStage = (stage: Stage, width: number, height: number) => {
+      stage.width(width);
+      stage.height(height);
+      stage.draw();
+    };
 
     return () => (
       <div class={cx("home")}>
@@ -74,7 +67,7 @@ export default defineComponent({
             },
           }}
         />
-        <div id="container" draggable={true} class={cx("container")} ref={refKonvaBox}></div>
+        <div id="container" class={cx("container")} ref={refKonvaBox}></div>
       </div>
     );
   },
