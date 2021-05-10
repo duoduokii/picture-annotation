@@ -24,9 +24,42 @@ export default defineComponent({
 
     const refKonvaBox = ref<HTMLDivElement | null>(null);
 
-    watch(annotationType, () => {
-      console.log(123);
-    });
+    let stageInstance: Konva.Stage | null = null;
+    let layerInstance: Konva.Layer | null = null;
+    let imageInstance: Konva.Image | null = null;
+
+    /**
+     *
+     * init Konva's instance
+     *
+     */
+    const initKonvaInstance = (el: HTMLDivElement, width: number, height: number) => {
+      stageInstance = createKonvaStage(el, width, height);
+      layerInstance = createKonvaLayer(stageInstance);
+      if (layerInstance !== null) {
+        drawImage(layerInstance, "../../assets/logo.png");
+      }
+    };
+
+    const drawImage = (layer: Konva.Layer, url: string) => {
+      drawKonvaImg(layer, Logo).then((res) => {
+        imageInstance = res;
+      });
+    };
+
+    /**
+     *
+     * update Stage's size
+     *
+     */
+    const updateStage = (stage: Stage, width: number, height: number) => {
+      stage.width(width);
+      stage.height(height);
+      stage.draw();
+      if (layerInstance == null || imageInstance == null) return;
+      imageInstance.destroy();
+      drawImage(layerInstance, "../../assets/logo.png");
+    };
 
     onMounted(() => {
       if (refKonvaBox.value == null) return;
@@ -44,37 +77,6 @@ export default defineComponent({
       });
       start();
     });
-
-    let stageInstance: Konva.Stage | null = null;
-    let layerInstance: Konva.Layer | null = null;
-    let selectedRect: Konva.Rect | null = null;
-
-    /**
-     * init Konva's instance
-     */
-    const initKonvaInstance = (el: HTMLDivElement, width: number, height: number) => {
-      stageInstance = createKonvaStage(el, width, height);
-      layerInstance = createKonvaLayer(stageInstance);
-      drawKonvaRect(layerInstance);
-      stageInstance.add(layerInstance);
-      drawSelectedRect(stageInstance, layerInstance);
-      if (layerInstance !== null) {
-        drawKonvaImage(layerInstance, "../../assets/logo.png");
-      }
-    };
-
-    /**
-     * update Stage's width and height
-     */
-    const updateStage = (stage: Stage, width: number, height: number) => {
-      stage.width(width);
-      stage.height(height);
-      stage.draw();
-    };
-
-    const drawKonvaImage = (layer: Konva.Layer, url: string) => {
-      drawKonvaImg(refKonvaBox.value as HTMLDivElement, layer, Logo);
-    };
 
     /**
      * draw selection rectangle
@@ -118,24 +120,6 @@ export default defineComponent({
         });
         layer.batchDraw();
       });
-
-      // stage.on("mouseup touchend", () => {
-      //   // no nothing if we didn't start selection
-      //   if (!selectionRectangle.visible()) {
-      //     return;
-      //   }
-      //   // update visibility in timeout, so we can check it in click event
-      //   setTimeout(() => {
-      //     selectionRectangle.visible(false);
-      //     layer.batchDraw();
-      //   });
-
-      //   var shapes = stage.find(".rect").toArray();
-      //   var box = selectionRectangle.getClientRect();
-      //   var selected = shapes.filter((shape) => Konva.Util.haveIntersection(box, shape.getClientRect()));
-      //   tr.nodes(selected);
-      //   layer.batchDraw();
-      // });
     };
 
     return () => (

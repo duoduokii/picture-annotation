@@ -36,30 +36,53 @@ export function createKonvaLayer(stage: Stage): Layer {
  * @return {*}
  */
 export function drawKonvaImg(
-  boxEl: Element,
   layer: Konva.Layer,
   url: string,
-  config?: { x: number; y: number; width?: number; height?: number }
-) {
-  console.log(boxEl.clientWidth);
-  const clientW = boxEl.clientWidth;
-  const clientH = boxEl.clientHeight;
+  config?: { x?: number; y?: number; width?: number; height?: number }
+): Promise<Konva.Image> {
+  const setImageResizeInfo = (imgW: number, imgH: number, clientW: number, clientH: number) => {
+    const aspectRatio = imgW / imgH;
+    let w: number = imgW,
+      h: number = imgH,
+      x: number = 0,
+      y: number = 0;
+    if (imgW > imgH) {
+      w = imgW > clientW ? clientW : imgW;
+      h = w / aspectRatio;
+    } else {
+      h = imgH > clientH ? clientH : imgH;
+      w = h * aspectRatio;
+    }
+    x = clientW / 2 - w / 2;
+    y = clientH / 2 - h / 2;
+    return { size: [w, h], position: [x, y] };
+  };
+
   const img = new Image();
   img.src = url;
-  const imgW = img.width;
-  const imgH = img.height;
-  img.onload = () => {
-    const konvaImg = new Konva.Image({
-      image: img,
-      x: config?.x || 0,
-      y: config?.y || 0,
-      width: config?.width || img.width,
-      height: config?.height || img.height,
-    });
-    layer.add(konvaImg);
-    layer.batchDraw();
-    return konvaImg;
-  };
+
+  return new Promise<Konva.Image>((resolve, reject) => {
+    img.onload = () => {
+      const clientW = layer.width();
+      const clientH = layer.height();
+      const imgW = img.width;
+      const imgH = img.height;
+      const getImageResizeInfo = setImageResizeInfo(imgW, imgH, clientW, clientH);
+      const [getW, getH] = getImageResizeInfo.size;
+      const [getX, getY] = getImageResizeInfo.position;
+
+      const konvaImg = new Konva.Image({
+        image: img,
+        x: config?.x || getX,
+        y: config?.y || getY,
+        width: config?.width || getW,
+        height: config?.height || getH,
+      });
+      layer.add(konvaImg);
+      layer.batchDraw();
+      resolve(konvaImg);
+    };
+  });
 }
 
 /**
