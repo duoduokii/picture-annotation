@@ -93,20 +93,7 @@ export function drawKonvaImg(
  * @param {Konva.RectConfig} config
  * @return {*}
  */
-export function drawKonvaRect(
-  layer: Konva.Layer,
-  config: RectConfig = {
-    x: 20,
-    y: 20,
-    width: 100,
-    height: 50,
-    stroke: "green",
-    strokeWidth: 1,
-    name: "rect",
-    draggable: true,
-    strokeScaleEnabled: false,
-  }
-): Rect {
+export function drawKonvaRect(layer: Konva.Layer, config: RectConfig): Rect {
   const rect = new Konva.Rect(config);
   layer.add(rect);
   layer.draw();

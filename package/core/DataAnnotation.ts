@@ -4,12 +4,12 @@ import { drawKonvaImg } from "./utils/konva";
 import { useElResize } from "./hooks/event/useElResize";
 import { createKonvaStage, createKonvaLayer } from "./utils/konva";
 
-enum AnnotationType {
+export enum AnnotationType {
   Text,
   Image,
 }
 
-interface DataAnnotationConfig {
+export interface DataAnnotationConfig {
   type: AnnotationType;
   url?: string;
 }
@@ -72,6 +72,7 @@ export class DataAnnotation {
 
 // , "../src/assets/logo.png"
 export function init(el: HTMLDivElement | string, config: DataAnnotationConfig): DataAnnotation {
+  if (el == undefined) return;
   // TODO div 类型判断
   let $el = typeof el === "string" ? (document.getElementById(el) as HTMLDivElement) : el;
   const DA = new DataAnnotation($el, config);

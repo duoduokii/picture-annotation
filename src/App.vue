@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import Home from "@/views/Home";
+import Home from "@/views/Test/index.vue";
 export default defineComponent({
   name: "App",
   components: { Home },
