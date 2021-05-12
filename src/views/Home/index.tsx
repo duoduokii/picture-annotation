@@ -7,6 +7,8 @@ import type { Rect, RectConfig } from "konva/types/shapes/Rect";
 
 import { createKonvaStage, createKonvaLayer, drawKonvaImg, drawKonvaRect } from "@/utils/konva";
 import { useElResize } from "@/hooks/event/useElResize";
+import { useEvent } from "./useEvent";
+import { useWrite } from "./useWrite";
 
 import SideBar from "./components/side-bar";
 import classNames from "classnames/bind";
@@ -36,6 +38,7 @@ export default defineComponent({
     const initKonvaInstance = (el: HTMLDivElement, width: number, height: number) => {
       stageInstance = createKonvaStage(el, width, height);
       layerInstance = createKonvaLayer(stageInstance);
+      useWrite(stageInstance, layerInstance);
       if (layerInstance !== null) {
         drawImage(layerInstance, "../../assets/logo.png");
       }
@@ -44,6 +47,7 @@ export default defineComponent({
     const drawImage = (layer: Konva.Layer, url: string) => {
       drawKonvaImg(layer, Logo).then((res) => {
         imageInstance = res;
+        useEvent(stageInstance as Konva.Stage, layerInstance as Konva.Layer);
       });
     };
 
@@ -68,7 +72,6 @@ export default defineComponent({
       const height = konvaEle.clientHeight;
 
       initKonvaInstance(konvaEle, width, height);
-
       const [start, stop] = useElResize(refKonvaBox.value, function () {
         if (stageInstance != null && refKonvaBox.value != null) {
           const { width, height } = refKonvaBox.value?.getBoundingClientRect();

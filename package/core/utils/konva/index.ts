@@ -1,6 +1,5 @@
 import Konva from "konva";
-import type { Stage } from "konva/types/Stage";
-import { Layer } from "konva/types/Layer";
+
 import { Rect, RectConfig } from "konva/types/shapes/Rect";
 
 /**
@@ -8,9 +7,9 @@ import { Rect, RectConfig } from "konva/types/shapes/Rect";
  * @param {HTMLDivElement} el
  * @param {number} width
  * @param {number} height
- * @return { Stage } stage
+ * @return { Stage } Konva.Stage
  */
-export function createKonvaStage(el: HTMLDivElement, width: number, height: number): Stage {
+export function createKonvaStage(el: HTMLDivElement | string, width: number, height: number): Konva.Stage {
   const stage = new Konva.Stage({
     container: el,
     width,
@@ -22,18 +21,20 @@ export function createKonvaStage(el: HTMLDivElement, width: number, height: numb
 /**
  * create Konva Layer
  * @param {Stage} stage
- * @return { Layer } layer
+ * @return { Layer } Konva.Layer
  */
-export function createKonvaLayer(stage: Stage): Layer {
+export function createKonvaLayer(stage: Konva.Stage): Konva.Layer {
   const layer = new Konva.Layer();
   stage.add(layer);
   return layer;
 }
 
 /**
- * draw konva img
- * @param {*}
- * @return {*}
+ * @description:
+ * @param { Konva.Layer } layer
+ * @param { string } url
+ * @param  config
+ * @return { Promise<Konva.Image> }
  */
 export function drawKonvaImg(
   layer: Konva.Layer,
@@ -88,12 +89,12 @@ export function drawKonvaImg(
 
 /**
  * draw konva rectangle
- * @param {Layer} layer
- * @param {RectConfig} config
+ * @param {Konva.Layer} layer
+ * @param {Konva.RectConfig} config
  * @return {*}
  */
-export const drawKonvaRect = (
-  layer: Layer,
+export function drawKonvaRect(
+  layer: Konva.Layer,
   config: RectConfig = {
     x: 20,
     y: 20,
@@ -105,8 +106,9 @@ export const drawKonvaRect = (
     draggable: true,
     strokeScaleEnabled: false,
   }
-): Rect => {
+): Rect {
   const rect = new Konva.Rect(config);
   layer.add(rect);
+  layer.draw();
   return rect;
-};
+}
