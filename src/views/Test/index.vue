@@ -11,15 +11,15 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from "vue";
-import DataAnnotation from "../../../package/core/index";
-import { AnnotationType } from "../../../package/core/DataAnnotation";
+import DataAnnotation from "../../../package/index";
 import LOGO from "@/assets/konva-test.jpg";
 export default defineComponent({
   name: "Test",
   setup() {
-    const DA = ref();
+    let DA = null;
     onMounted(() => {
-      DA.value = DataAnnotation.init("content", { type: AnnotationType.Image, url: LOGO });
+      DA = DataAnnotation.init("content");
+      DA.setOptions({ url: LOGO });
     });
   },
 });
