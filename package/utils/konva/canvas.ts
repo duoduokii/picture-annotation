@@ -87,7 +87,7 @@ export function drawKonvaImg(layer: Konva.Layer, url: string): Promise<Konva.Ima
  * @param {Konva.RectConfig} config
  * @return {*}
  */
-export function drawKonvaRect(layer: Konva.Layer, config: Konva.RectConfig): Konva.Rect {
+export function createKonvaRect(layer: Konva.Layer, config: Konva.RectConfig): Konva.Rect {
   const rect = new Konva.Rect(config);
   layer.add(rect);
   layer.draw();

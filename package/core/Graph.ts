@@ -1,5 +1,5 @@
 import Konva from "konva";
-import { createKonvaStage, createKonvaLayer, drawKonvaImg } from "../utils/konva";
+import { createKonvaStage, createKonvaLayer, drawKonvaImg } from "../utils/konva/canvas";
 import { useElResize } from "../hooks/event/useElResize";
 
 export class DaGraph {
