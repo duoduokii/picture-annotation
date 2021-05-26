@@ -1,4 +1,4 @@
-import { init } from "./DataAnnotation";
+import { init } from "./DataTagger";
 
 export default {
   init,
